@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmn:definitions
+  xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/"
+  xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/"
+  xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/"
+  xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+  xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+  id="defs_device_eligibility"
+  name="deviceEligibility"
+  namespace="urn:telco:eligibility:v1"
+  expressionLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/"
+  typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/">
+
+  <!-- Item Definitions -->
+  <dmn:itemDefinition id="tDevice" name="tDevice">
+    <dmn:itemComponent name="model">
+      <dmn:typeRef>string</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent name="imeiStatus">
+      <dmn:typeRef>string</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+
+  <dmn:itemDefinition id="tCustomer" name="tCustomer">
+    <dmn:itemComponent name="contractStatus">
+      <dmn:typeRef>string</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent name="outstandingBalance">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+
+  <!-- Input Data -->
+  <dmn:inputData id="in_device" name="device">
+    <dmn:variable name="device" typeRef="tDevice"/>
+  </dmn:inputData>
+
+  <dmn:inputData id="in_customer" name="customer">
+    <dmn:variable name="customer" typeRef="tCustomer"/>
+  </dmn:inputData>
+
+  <!-- Main Decision -->
+  <dmn:decision id="d_deviceEligibility" name="deviceEligibility">
+    <dmn:variable name="deviceEligibility" typeRef="string"/>
+    <dmn:informationRequirement>
+      <dmn:requiredInput href="#in_device"/>
+    </dmn:informationRequirement>
+    <dmn:informationRequirement>
+      <dmn:requiredInput href="#in_customer"/>
+    </dmn:informationRequirement>
+    <dmn:literalExpression>
+      <dmn:text>
+        if device.imeiStatus = "clean" and customer.contractStatus = "active" and customer.outstandingBalance &lt;= 0 
+        then "Eligible" 
+        else "Not Eligible"
+      </dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+
+</dmn:definitions>

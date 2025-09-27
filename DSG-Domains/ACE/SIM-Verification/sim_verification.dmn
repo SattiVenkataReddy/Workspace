@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+             id="definitions_sim_decision"
+             name="SIM Verification Decisions"
+             namespace="https://t-mobile.com/dmn/sim-verification">
+
+  <!-- Types -->
+  <itemDefinition id="t_string" name="t_string"><typeRef>string</typeRef></itemDefinition>
+  <itemDefinition id="t_number" name="t_number"><typeRef>number</typeRef></itemDefinition>
+
+  <!-- Inputs (inputData elements) -->
+  <inputData id="in_isSimLive" name="isSimLive">
+    <variable id="var_isSimLive" name="isSimLive" typeRef="string"/>
+  </inputData>
+
+  <inputData id="in_storeProximityDistance" name="storeProximityDistance">
+    <variable id="var_storeProximityDistance" name="storeProximityDistance" typeRef="number"/>
+  </inputData>
+
+  <inputData id="in_StepupVerification" name="StepupVerification">
+    <variable id="var_StepupVerification" name="StepupVerification" typeRef="string"/>
+  </inputData>
+
+  <inputData id="in_stepupVerification" name="stepupVerification">
+    <variable id="var_stepupVerification" name="stepupVerification" typeRef="string"/>
+  </inputData>
+
+  <!-- Decision -->
+  <decision id="d_setDecision" name="SetDecision">
+    <variable id="v_setDecision" name="SetDecision" typeRef="string"/>
+
+    <!-- Wire inputs to decision -->
+    <informationRequirement>
+      <requiredInput href="#in_isSimLive"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_storeProximityDistance"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_StepupVerification"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_stepupVerification"/>
+    </informationRequirement>
+
+    <decisionTable id="dt_sim_decision" hitPolicy="FIRST" preferredOrientation="Rule-as-Row">
+      <!-- Inputs -->
+      <input id="i_isSimLive">
+        <inputExpression id="ie_isSimLive" typeRef="string">
+          <text>isSimLive</text>
+        </inputExpression>
+      </input>
+      <input id="i_storeProximityDistance">
+        <inputExpression id="ie_storeProximityDistance" typeRef="number">
+          <text>storeProximityDistance</text>
+        </inputExpression>
+      </input>
+      <input id="i_stepupVerification">
+        <inputExpression id="ie_stepupVerification" typeRef="string">
+          <text>StepupVerification</text>
+        </inputExpression>
+      </input>
+      <input id="i_primaryVerification">
+        <inputExpression id="ie_primaryVerification" typeRef="string">
+          <text>stepupVerification</text>
+        </inputExpression>
+      </input>
+
+      <!-- Outputs -->
+      <output id="o_setDecision" name="SetDecision" typeRef="string"/>
+      <output id="o_setDecisionReason" name="SetDecisionReason" typeRef="string"/>
+
+      <!-- Declare annotation column so KIE shows it -->
+      <annotation name="NAME"/>
+
+      <!-- Rules (NAME column used as annotation) -->
+
+      <!-- 1. Sim Active not available -->
+      <rule id="r1">
+        <inputEntry id="r1c1"><text>"NOT AVAILABLE"</text></inputEntry>
+        <inputEntry id="r1c2"><text>-</text></inputEntry>
+        <inputEntry id="r1c3"><text>-</text></inputEntry>
+        <inputEntry id="r1c4"><text>-</text></inputEntry>
+        <outputEntry id="r1o1"><text>"NO DECISION"</text></outputEntry>
+        <outputEntry id="r1o2"><text>"Sim active not available"</text></outputEntry>
+        <annotationEntry><text>Sim Active not available</text></annotationEntry>
+      </rule>
+
+      <!-- 2. Stepup Verification not available -->
+      <rule id="r2">
+        <inputEntry id="r2c1"><text>-</text></inputEntry>
+        <inputEntry id="r2c2"><text>-</text></inputEntry>
+        <inputEntry id="r2c3"><text>"NOT AVAILABLE"</text></inputEntry>
+        <inputEntry id="r2c4"><text>"NOT AVAILABLE"</text></inputEntry>
+        <outputEntry id="r2o1"><text>"NO DECISION"</text></outputEntry>
+        <outputEntry id="r2o2"><text>"Stepup Verification Not Available"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification not available</text></annotationEntry>
+      </rule>
+
+      <!-- 3. Primary Verification not available -->
+      <rule id="r3">
+        <inputEntry id="r3c1"><text>-</text></inputEntry>
+        <inputEntry id="r3c2"><text>-</text></inputEntry>
+        <inputEntry id="r3c3"><text>-</text></inputEntry>
+        <inputEntry id="r3c4"><text>"NOT AVAILABLE"</text></inputEntry>
+        <outputEntry id="r3o1"><text>"NO DECISION"</text></outputEntry>
+        <outputEntry id="r3o2"><text>"Primary Verification Not Available"</text></outputEntry>
+        <annotationEntry><text>Primary Verification not available</text></annotationEntry>
+      </rule>
+
+      <!-- 4. Sim is live, user attestation and proximity not available -->
+      <rule id="r4">
+        <inputEntry id="r4c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r4c2"><text>&lt; 0</text></inputEntry>
+        <inputEntry id="r4c3"><text>-</text></inputEntry>
+        <inputEntry id="r4c4"><text>-</text></inputEntry>
+        <outputEntry id="r4o1"><text>"NO DECISION"</text></outputEntry>
+        <outputEntry id="r4o2"><text>"Sim is live, but proximity not available"</text></outputEntry>
+        <annotationEntry><text>Sim is live, user attestation and proximity not available</text></annotationEntry>
+      </rule>
+
+      <!-- ACCEPT within proximity (Step-up verification paths) -->
+      <rule id="r5">
+        <inputEntry id="r5c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r5c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r5c3"><text>"ID_Verified"</text></inputEntry>
+        <inputEntry id="r5c4"><text>-</text></inputEntry>
+        <outputEntry id="r5o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r5o2"><text>"Sim is live and within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - ID Verified : Sim is live and within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r6">
+        <inputEntry id="r6c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r6c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r6c3"><text>"OTP_Verified"</text></inputEntry>
+        <inputEntry id="r6c4"><text>-</text></inputEntry>
+        <outputEntry id="r6o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r6o2"><text>"Sim is live and within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - OTP Verified : Sim is live and within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r7">
+        <inputEntry id="r7c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r7c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r7c3"><text>"Face_Verified"</text></inputEntry>
+        <inputEntry id="r7c4"><text>-</text></inputEntry>
+        <outputEntry id="r7o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r7o2"><text>"Sim is live and within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - Face Verified : Sim is live and within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r8">
+        <inputEntry id="r8c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r8c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r8c3"><text>"2nd_Rep_Attestation"</text></inputEntry>
+        <inputEntry id="r8c4"><text>-</text></inputEntry>
+        <outputEntry id="r8o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r8o2"><text>"Sim is live and within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - 2nd Rep Attestation : Sim is live and within store proximity</text></annotationEntry>
+      </rule>
+
+      <!-- ACCEPT within proximity (Primary verification paths) -->
+      <rule id="r9">
+        <inputEntry id="r9c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r9c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r9c3"><text>-</text></inputEntry>
+        <inputEntry id="r9c4"><text>"ID_Verified"</text></inputEntry>
+        <outputEntry id="r9o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r9o2"><text>"Sim is live and within store proximity"</text></outputEntry>
+        <annotationEntry><text>Primary Verification - ID Verified : Sim is live and within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r10">
+        <inputEntry id="r10c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r10c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r10c3"><text>-</text></inputEntry>
+        <inputEntry id="r10c4"><text>"Face_Verified"</text></inputEntry>
+        <outputEntry id="r10o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r10o2"><text>"Sim is live and within store proximity"</text></outputEntry>
+        <annotationEntry><text>Primary Verification - Face Verified : Sim is live and within store proximity</text></annotationEntry>
+      </rule>
+
+      <!--  Sim live & within proximity, not verified -->
+      <rule id="r11">
+        <inputEntry id="r11c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r11c2"><text>&lt;= 2</text></inputEntry>
+        <inputEntry id="r11c3"><text>-</text></inputEntry>
+        <inputEntry id="r11c4"><text>-</text></inputEntry>
+        <outputEntry id="r11o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r11o2"><text>"Sim is live and within store proximity, not verified"</text></outputEntry>
+        <annotationEntry><text>Sim is live and within store proximity, not verified</text></annotationEntry>
+      </rule>
+
+      <!-- REJECT outside proximity (Step-up verification paths) -->
+      <rule id="r12">
+        <inputEntry id="r12c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r12c2"><text>&gt; 2</text></inputEntry>
+        <inputEntry id="r12c3"><text>"ID_Verified"</text></inputEntry>
+        <inputEntry id="r12c4"><text>-</text></inputEntry>
+        <outputEntry id="r12o1"><text>"REJECT"</text></outputEntry>
+        <outputEntry id="r12o2"><text>"Sim is live but not within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - ID Verified : Sim is live but not within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r13">
+        <inputEntry id="r13c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r13c2"><text>&gt; 2</text></inputEntry>
+        <inputEntry id="r13c3"><text>"OTP_Verified"</text></inputEntry>
+        <inputEntry id="r13c4"><text>-</text></inputEntry>
+        <outputEntry id="r13o1"><text>"REJECT"</text></outputEntry>
+        <outputEntry id="r13o2"><text>"Sim is live but not within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - OTP Verified : Sim is live but not within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r14">
+        <inputEntry id="r14c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r14c2"><text>&gt; 2</text></inputEntry>
+        <inputEntry id="r14c3"><text>"Face_Verified"</text></inputEntry>
+        <inputEntry id="r14c4"><text>-</text></inputEntry>
+        <outputEntry id="r14o1"><text>"REJECT"</text></outputEntry>
+        <outputEntry id="r14o2"><text>"Sim is live but not within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - Face Verified : Sim is live but not within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r15">
+        <inputEntry id="r15c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r15c2"><text>&gt; 2</text></inputEntry>
+        <inputEntry id="r15c3"><text>"2nd_Rep_Attestation"</text></inputEntry>
+        <inputEntry id="r15c4"><text>-</text></inputEntry>
+        <outputEntry id="r15o1"><text>"REJECT"</text></outputEntry>
+        <outputEntry id="r15o2"><text>"Sim is live but not within store proximity"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - 2nd Rep Attestation : Sim is live but not within store proximity</text></annotationEntry>
+      </rule>
+
+      <!-- REJECT outside proximity (Primary verification paths) -->
+      <rule id="r16">
+        <inputEntry id="r16c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r16c2"><text>&gt; 2</text></inputEntry>
+        <inputEntry id="r16c3"><text>-</text></inputEntry>
+        <inputEntry id="r16c4"><text>"ID_Verified"</text></inputEntry>
+        <outputEntry id="r16o1"><text>"REJECT"</text></outputEntry>
+        <outputEntry id="r16o2"><text>"Sim is live but not within store proximity"</text></outputEntry>
+        <annotationEntry><text>Primary Verification - ID Verified : Sim is live but not within store proximity</text></annotationEntry>
+      </rule>
+
+      <rule id="r17">
+        <inputEntry id="r17c1"><text>"TRUE"</text></inputEntry>
+        <inputEntry id="r17c2"><text>&gt; 2</text></inputEntry>
+        <inputEntry id="r17c3"><text>-</text></inputEntry>
+        <inputEntry id="r17c4"><text>"Face_Verified"</text></inputEntry>
+        <outputEntry id="r17o1"><text>"REJECT"</text></outputEntry>
+        <outputEntry id="r17o2"><text>"Sim is live but not within store proximity"</text></outputEntry>
+        <annotationEntry><text>Primary Verification - Face Verified : Sim is live but not within store proximity</text></annotationEntry>
+      </rule>
+
+      <!-- Inactive SIM + any store verification => ACCEPT -->
+      <rule id="r18">
+        <inputEntry id="r18c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r18c2"><text>-</text></inputEntry>
+        <inputEntry id="r18c3"><text>"ID_Verified"</text></inputEntry>
+        <inputEntry id="r18c4"><text>-</text></inputEntry>
+        <outputEntry id="r18o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r18o2"><text>"Store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - ID Verified : Store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+      <rule id="r19">
+        <inputEntry id="r19c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r19c2"><text>-</text></inputEntry>
+        <inputEntry id="r19c3"><text>"OTP_Verified"</text></inputEntry>
+        <inputEntry id="r19c4"><text>-</text></inputEntry>
+        <outputEntry id="r19o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r19o2"><text>"Store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - OTP Verified : Store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+      <rule id="r20">
+        <inputEntry id="r20c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r20c2"><text>-</text></inputEntry>
+        <inputEntry id="r20c3"><text>"Face_Verified"</text></inputEntry>
+        <inputEntry id="r20c4"><text>-</text></inputEntry>
+        <outputEntry id="r20o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r20o2"><text>"Store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - Face Verified : Store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+      <rule id="r21">
+        <inputEntry id="r21c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r21c2"><text>-</text></inputEntry>
+        <inputEntry id="r21c3"><text>"2nd_Rep_Attestation"</text></inputEntry>
+        <inputEntry id="r21c4"><text>-</text></inputEntry>
+        <outputEntry id="r21o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r21o2"><text>"Store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>Stepup Verification - 2nd Rep Attestation : Store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+      <rule id="r22">
+        <inputEntry id="r22c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r22c2"><text>-</text></inputEntry>
+        <inputEntry id="r22c3"><text>-</text></inputEntry>
+        <inputEntry id="r22c4"><text>"ID_Verified"</text></inputEntry>
+        <outputEntry id="r22o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r22o2"><text>"Store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>Primary Verification - ID Verified : Store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+      <rule id="r23">
+        <inputEntry id="r23c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r23c2"><text>-</text></inputEntry>
+        <inputEntry id="r23c3"><text>-</text></inputEntry>
+        <inputEntry id="r23c4"><text>"Face_Verified"</text></inputEntry>
+        <outputEntry id="r23o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r23o2"><text>"Store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>Primary Verification - Face Verified : Store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+      <!-- No store verification and inactive SIM -->
+      <rule id="r24">
+        <inputEntry id="r24c1"><text>"FALSE"</text></inputEntry>
+        <inputEntry id="r24c2"><text>-</text></inputEntry>
+        <inputEntry id="r24c3"><text>-</text></inputEntry>
+        <inputEntry id="r24c4"><text>-</text></inputEntry>
+        <outputEntry id="r24o1"><text>"ACCEPT"</text></outputEntry>
+        <outputEntry id="r24o2"><text>"No store verification and inactive SIM"</text></outputEntry>
+        <annotationEntry><text>No store verification and inactive SIM</text></annotationEntry>
+      </rule>
+
+    </decisionTable>
+  </decision>
+</definitions>
