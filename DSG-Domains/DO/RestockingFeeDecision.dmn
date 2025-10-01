@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+  xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+  xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+  xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+  xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+  id="definitions_restocking_fees_v1"
+  name="Restocking Fees"
+  namespace="urn:tmo:restocking:dmn:v1">
+
+  <!-- Input data -->
+  <inputData id="in_stateCode" name="stateCode">
+    <variable id="var_stateCode" name="stateCode" typeRef="string"/>
+  </inputData>
+  <inputData id="in_lineOfBusiness" name="lineOfBusiness">
+    <variable id="var_lineOfBusiness" name="lineOfBusiness" typeRef="string"/>
+  </inputData>
+  <inputData id="in_productSubType" name="productSubType">
+    <variable id="var_productSubType" name="productSubType" typeRef="string"/>
+  </inputData>
+  <inputData id="in_applicationId" name="applicationId">
+    <variable id="var_applicationId" name="applicationId" typeRef="string"/>
+  </inputData>
+  <inputData id="in_salesChannel" name="salesChannel">
+    <variable id="var_salesChannel" name="salesChannel" typeRef="string"/>
+  </inputData>
+  <inputData id="in_transactionType" name="transactionType">
+    <variable id="var_transactionType" name="transactionType" typeRef="string"/>
+  </inputData>
+  <inputData id="in_unitPrice" name="unitPrice">
+    <variable id="var_unitPrice" name="unitPrice" typeRef="number"/>
+  </inputData>
+
+  <!-- Decision -->
+  <decision id="dec_restocking" name="Restocking Decision">
+    <variable id="var_restocking" name="Restocking Decision" typeRef="Any"/>
+    <informationRequirement>
+      <requiredInput href="#in_stateCode"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_lineOfBusiness"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_productSubType"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_applicationId"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_salesChannel"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_transactionType"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#in_unitPrice"/>
+    </informationRequirement>
+
+    <decisionTable id="dt_restocking" hitPolicy="FIRST">
+      <!-- Inputs (order matters for readability only) -->
+      <input id="i_stateCode">
+        <inputExpression id="iex_stateCode" typeRef="string">
+          <text>stateCode</text>
+        </inputExpression>
+      </input>
+      <input id="i_lineOfBusiness">
+        <inputExpression id="iex_lineOfBusiness" typeRef="string">
+          <text>lineOfBusiness</text>
+        </inputExpression>
+      </input>
+      <input id="i_productSubType">
+        <inputExpression id="iex_productSubType" typeRef="string">
+          <text>productSubType</text>
+        </inputExpression>
+      </input>
+      <input id="i_applicationId">
+        <inputExpression id="iex_applicationId" typeRef="string">
+          <text>applicationId</text>
+        </inputExpression>
+      </input>
+      <input id="i_salesChannel">
+        <inputExpression id="iex_salesChannel" typeRef="string">
+          <text>salesChannel</text>
+        </inputExpression>
+      </input>
+      <input id="i_transactionType">
+        <inputExpression id="iex_transactionType" typeRef="string">
+          <text>transactionType</text>
+        </inputExpression>
+      </input>
+      <input id="i_unitPrice">
+        <inputExpression id="iex_unitPrice" typeRef="number">
+          <text>unitPrice</text>
+        </inputExpression>
+      </input>
+
+      <!-- Outputs -->
+      <output id="o_restockingFee" name="restockingFee" typeRef="number"/>
+      <output id="o_restockingSKU" name="restockingSKU" typeRef="string"/>
+
+      <!-- Zero-fee rules -->
+      <!-- 1. HI/PR/VI -->
+      <rule id="r1">
+        <inputEntry id="r1_c1"><text>"HI","PR","VI"</text></inputEntry>
+        <inputEntry id="r1_c2"><text>-</text></inputEntry>
+        <inputEntry id="r1_c3"><text>-</text></inputEntry>
+        <inputEntry id="r1_c4"><text>-</text></inputEntry>
+        <inputEntry id="r1_c5"><text>-</text></inputEntry>
+        <inputEntry id="r1_c6"><text>-</text></inputEntry>
+        <inputEntry id="r1_c7"><text>-</text></inputEntry>
+        <outputEntry id="r1_o1"><text>0</text></outputEntry>
+        <outputEntry id="r1_o2"><text>""</text></outputEntry>
+      </rule>
+
+      <!-- 2. LOB in {METRO, MAGENTAPREPAID, MAGENTAPREPAIDCONNECT} -->
+      <rule id="r2">
+        <inputEntry id="r2_c1"><text>-</text></inputEntry>
+        <inputEntry id="r2_c2"><text>"METRO","MAGENTAPREPAID","MAGENTAPREPAIDCONNECT"</text></inputEntry>
+        <inputEntry id="r2_c3"><text>-</text></inputEntry>
+        <inputEntry id="r2_c4"><text>-</text></inputEntry>
+        <inputEntry id="r2_c5"><text>-</text></inputEntry>
+        <inputEntry id="r2_c6"><text>-</text></inputEntry>
+        <inputEntry id="r2_c7"><text>-</text></inputEntry>
+        <outputEntry id="r2_o1"><text>0</text></outputEntry>
+        <outputEntry id="r2_o2"><text>""</text></outputEntry>
+      </rule>
+
+      <!-- 3. productSubType != "Handset" (i.e., Not Handset) -->
+      <rule id="r3">
+        <inputEntry id="r3_c1"><text>-</text></inputEntry>
+        <inputEntry id="r3_c2"><text>-</text></inputEntry>
+        <inputEntry id="r3_c3"><text>not("Handset")</text></inputEntry>
+        <inputEntry id="r3_c4"><text>-</text></inputEntry>
+        <inputEntry id="r3_c5"><text>-</text></inputEntry>
+        <inputEntry id="r3_c6"><text>-</text></inputEntry>
+        <inputEntry id="r3_c7"><text>-</text></inputEntry>
+        <outputEntry id="r3_o1"><text>0</text></outputEntry>
+        <outputEntry id="r3_o2"><text>""</text></outputEntry>
+      </rule>
+
+      <!-- 4. applicationId = TPAS -->
+      <rule id="r4">
+        <inputEntry id="r4_c1"><text>-</text></inputEntry>
+        <inputEntry id="r4_c2"><text>-</text></inputEntry>
+        <inputEntry id="r4_c3"><text>-</text></inputEntry>
+        <inputEntry id="r4_c4"><text>"TPAS"</text></inputEntry>
+        <inputEntry id="r4_c5"><text>-</text></inputEntry>
+        <inputEntry id="r4_c6"><text>-</text></inputEntry>
+        <inputEntry id="r4_c7"><text>-</text></inputEntry>
+        <outputEntry id="r4_o1"><text>0</text></outputEntry>
+        <outputEntry id="r4_o2"><text>""</text></outputEntry>
+      </rule>
+
+      <!-- Tiered fees for all other regions (i.e., not HI/PR/VI) and MAGENTA Handset, non-TPAS, specific channels & transactions -->
+      <!-- 5. $0 – $299.99 => 25 / RSTK$25 -->
+      <rule id="r5">
+        <inputEntry id="r5_c1"><text>not("HI","PR","VI")</text></inputEntry>
+        <inputEntry id="r5_c2"><text>"MAGENTA"</text></inputEntry>
+        <inputEntry id="r5_c3"><text>"Handset"</text></inputEntry>
+        <inputEntry id="r5_c4"><text>not("TPAS")</text></inputEntry>
+        <inputEntry id="r5_c5"><text>"WEB","CARE","RETAIL","TSL","TELESALES_CD","TELESALES_BD"</text></inputEntry>
+        <inputEntry id="r5_c6"><text>"CHANGEDEVICE","ACTIVATION","ADDALINE","PURCHASEEQUIPMENT"</text></inputEntry>
+        <inputEntry id="r5_c7"><text>[0..299.99]</text></inputEntry>
+        <outputEntry id="r5_o1"><text>25</text></outputEntry>
+        <outputEntry id="r5_o2"><text>"RSTK$25"</text></outputEntry>
+      </rule>
+
+      <!-- 6. $300 – $599.99 => 50 / RSTK$50 -->
+      <rule id="r6">
+        <inputEntry id="r6_c1"><text>not("HI","PR","VI")</text></inputEntry>
+        <inputEntry id="r6_c2"><text>"MAGENTA"</text></inputEntry>
+        <inputEntry id="r6_c3"><text>"Handset"</text></inputEntry>
+        <inputEntry id="r6_c4"><text>not("TPAS")</text></inputEntry>
+        <inputEntry id="r6_c5"><text>"WEB","CARE","RETAIL","TSL","TELESALES_CD","TELESALES_BD"</text></inputEntry>
+        <inputEntry id="r6_c6"><text>"CHANGEDEVICE","ACTIVATION","ADDALINE","PURCHASEEQUIPMENT"</text></inputEntry>
+        <inputEntry id="r6_c7"><text>[300..599.99]</text></inputEntry>
+        <outputEntry id="r6_o1"><text>50</text></outputEntry>
+        <outputEntry id="r6_o2"><text>"RSTK$50"</text></outputEntry>
+      </rule>
+
+      <!-- 7. $600 – $9,999.99 => 75 / RSTK$75 -->
+      <rule id="r7">
+        <inputEntry id="r7_c1"><text>not("HI","PR","VI")</text></inputEntry>
+        <inputEntry id="r7_c2"><text>"MAGENTA"</text></inputEntry>
+        <inputEntry id="r7_c3"><text>"Handset"</text></inputEntry>
+        <inputEntry id="r7_c4"><text>not("TPAS")</text></inputEntry>
+        <inputEntry id="r7_c5"><text>"WEB","CARE","RETAIL","TSL","TELESALES_CD","TELESALES_BD"</text></inputEntry>
+        <inputEntry id="r7_c6"><text>"CHANGEDEVICE","ACTIVATION","ADDALINE","PURCHASEEQUIPMENT"</text></inputEntry>
+        <inputEntry id="r7_c7"><text>[600..9999.99]</text></inputEntry>
+        <outputEntry id="r7_o1"><text>75</text></outputEntry>
+        <outputEntry id="r7_o2"><text>"RSTK$75"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
